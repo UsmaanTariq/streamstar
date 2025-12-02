@@ -4,9 +4,6 @@ import TrackSection from "./components/TrackSection";
 
 export default function MyProfile() {
 
-    const getTracks = async () => {
-        
-    }
     return (
         <>
             <Navbar />

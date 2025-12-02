@@ -91,9 +91,9 @@ const TrackSection = () => {
 
     return (
         <>
-            <div className="px-12 py-6 flex justify-center">
-                <div className="flex flex-col max-w-7xl p-8 w-full border-2">
-                    <h1 className="text-2xl font-bold">Your Credits</h1>
+            <div className="px-16 py-6 flex justify-center">
+                <div className="flex flex-col max-w-7xl p-16 w-full rounded-2xl bg-white shadow-lg overflow-hidden">
+                    <h1 className="text-2xl font-bold mb-4">Your Credits</h1>
                     <div className="flex flex-col gap-4">
                         {data.map((track) => (
                             <Track 
@@ -103,6 +103,9 @@ const TrackSection = () => {
                                 created_at={track.created_at} 
                                 artist_name={track.artist_name}
                                 popularity = {track.popularity}
+                                streams = {track.spotify_streams}
+                                release_date = {track.release_date}
+                                image_url = {track.image_url}
                             />
                         ))}
                     </div>
@@ -135,3 +138,4 @@ export default TrackSection;
 //     album_name text null,
 //     constraint tracks_pkey primary key (id)
 //   ) TABLESPACE pg_default;
+

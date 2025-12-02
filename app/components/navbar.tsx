@@ -67,8 +67,8 @@ export default function Navbar() {
                         Search Artists
                     </Link>
                     {user && (
-                        <Link href="/dashboard" className="text-gray-700 hover:text-black font-medium transition-colors">
-                            My Dashboard
+                        <Link href="/myprofile" className="text-gray-700 hover:text-black font-medium transition-colors">
+                            My Profile
                         </Link>
                     )}
                 </div>

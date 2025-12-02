@@ -42,7 +42,7 @@ const SearchTrack = () => {
         <>
             <div className={`min-h-screen px-12 py-6 ${tracks.length > 0 ? 'flex gap-12' : 'flex justify-center items-center'}`}>
                 {/* Search Section */}
-                <div className={`flex items-center ${tracks.length > 0 ? 'w-1/3' : 'w-full max-w-2xl'}`}>
+                <div className={`flex items-center ${tracks.length > 0 ? 'w-1/3' : 'w-full max-w-4xl'}`}>
                     <div className="flex flex-col gap-8 p-12 shadow-xl rounded-2xl bg-white w-full">
                         <div>
                             <h1 className="text-4xl font-bold mb-3">Search Track</h1>
@@ -113,6 +113,8 @@ const SearchTrack = () => {
                                                 releaseDate={track.album.release_date}
                                                 trackName={track.name}
                                                 score={track.popularity}
+                                                spotify_url={track.external_urls.spotify}
+                                                image_url = {track.album?.images[0].url}
                                             />
                                         </div>
                                     </div>

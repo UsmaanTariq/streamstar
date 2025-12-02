@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/client"
 import { useState } from "react"
+import { fetchTrackStreams } from "@/services/ApifyAPI"
 
 interface AddButtonProps {
     trackID: string
@@ -8,9 +9,11 @@ interface AddButtonProps {
     releaseDate: string
     trackName: string
     score: number
+    spotify_url: string
+    image_url: string
 }
 
-const addButton = ({trackID, artist, albumName, releaseDate, trackName, score}: AddButtonProps) => {
+const addButton = ({trackID, artist, albumName, releaseDate, trackName, score, spotify_url, image_url}: AddButtonProps) => {
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
 
@@ -25,13 +28,19 @@ const addButton = ({trackID, artist, albumName, releaseDate, trackName, score}: 
                 alert('Please sign in to add tracks')
                 return
             }
+            const streamData = await fetchTrackStreams(spotify_url)
+            console.log('Stream data:', streamData)
+            
 
             const {data: uploadedTrack, error } = await supabase.from("tracks").insert([{
                 track_id: trackID,
                 artist_name: artist,
                 album_name: albumName,
                 track_name: trackName,
-                popularity: score
+                popularity: score,
+                spotify_streams: streamData.streamCount,
+                image_url: image_url,
+                release_date: releaseDate
             }]).select().single()
 
 
