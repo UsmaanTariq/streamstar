@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import DeleteButton from './DeleteButton'
 
 interface TrackProps {
     track_name: string
@@ -9,9 +10,10 @@ interface TrackProps {
     streams: number
     release_date: string
     image_url: string
+    user_track_id: number
 }
 
-const Track = ({ track_name, artist_name, album_name, popularity, streams, release_date, image_url }: TrackProps) => {
+const Track = ({ track_name, artist_name, album_name, popularity, streams, release_date, image_url, user_track_id }: TrackProps) => {
     const formattedStreams = streams?.toLocaleString() || '0'
     
     return (
@@ -66,6 +68,16 @@ const Track = ({ track_name, artist_name, album_name, popularity, streams, relea
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className='flex flex-col justify-center gap-3'>
+                {/* Delete Button */}
+                <DeleteButton user_track_id={user_track_id}/>
+                {/* Info Button */}
+                <button className='p-2 rounded-lg hover:bg-blue-100 transition-colors'>
+                    <svg className="w-5 h-5 text-blue-500 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </button>
             </div>
         </div>
     )

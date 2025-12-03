@@ -43,13 +43,11 @@ const TrackSection = () => {
             
             const supabase = createClient()
             
-            // Step 1: Get user's track IDs from user_tracks
+            // Step 1: Get user's track IDs from user_tracks (include id for deletion)
             const { data: userTracksData, error: userTracksError } = await supabase
                 .from('user_tracks')
-                .select('track_id')
+                .select('id, track_id')
                 .eq('user_id', currentUser.id)
-            
-            // console.log('User tracks data:', userTracksData)
             
             if (userTracksError) {
                 console.error('Error fetching user tracks:', userTracksError)
@@ -64,7 +62,6 @@ const TrackSection = () => {
 
             // Step 2: Extract track IDs
             const trackIds = userTracksData.map((ut: any) => ut.track_id)
-            // console.log('Track IDs to fetch:', trackIds)
 
             // Step 3: Get full track details from tracks table
             const { data: tracksData, error: tracksError } = await supabase
@@ -72,14 +69,24 @@ const TrackSection = () => {
                 .select('*')
                 .in('id', trackIds)
             
-            // console.log('Full tracks data:', tracksData)
-            
             if (tracksError) {
                 console.error('Error fetching tracks:', tracksError)
                 return
             }
 
-            setData(tracksData || [])
+            // Step 4: Merge user_tracks.id with tracks data
+            const mergedData = tracksData?.map((track: any) => {
+                // Use Number() to ensure consistent type comparison
+                const userTrack = userTracksData.find((ut: any) => Number(ut.track_id) === Number(track.id))
+                console.log('Track ID:', track.id, 'Found userTrack:', userTrack)
+                return {
+                    ...track,
+                    user_track_id: userTrack?.id
+                }
+            }) || []
+
+            console.log('Merged data:', mergedData)
+            setData(mergedData)
 
         } catch (error) {
             console.log('Catch block error:', error)
@@ -93,7 +100,11 @@ const TrackSection = () => {
         <>
             <div className="px-16 py-6 flex justify-center">
                 <div className="flex flex-col max-w-7xl p-16 w-full rounded-2xl bg-white shadow-lg overflow-hidden">
-                    <h1 className="text-2xl font-bold mb-4">Your Credits</h1>
+                    <div className="flex justify-between mb-2">
+                        <h1 className="text-2xl font-bold">Your Credits</h1>
+                        <input placeholder="Search Bar" className="p-3 border-2 rounded-md border-gray-200"></input>
+                        <button className="text-2xl px-4">Filter</button>
+                    </div>
                     <div className="flex flex-col gap-4">
                         {data.map((track) => (
                             <Track 
@@ -102,10 +113,11 @@ const TrackSection = () => {
                                 album_name={track.album_name} 
                                 created_at={track.created_at} 
                                 artist_name={track.artist_name}
-                                popularity = {track.popularity}
-                                streams = {track.spotify_streams}
-                                release_date = {track.release_date}
-                                image_url = {track.image_url}
+                                popularity={track.popularity}
+                                streams={track.spotify_streams}
+                                release_date={track.release_date}
+                                image_url={track.image_url}
+                                user_track_id={track.user_track_id}
                             />
                         ))}
                     </div>

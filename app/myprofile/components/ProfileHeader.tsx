@@ -8,6 +8,8 @@ const ProfileHeader = () => {
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [profile, setProfile] = useState<any>(null)
+    const [totalStreams, setTotalStreams] = useState<number>(0)
+    const [trackCount, setTrackCount] = useState<number>(0)
 
     useEffect(() => {
         // Check user on mount
@@ -47,6 +49,9 @@ const ProfileHeader = () => {
             console.log('Profile data:', data)
             setProfile(data)
 
+            // Count streams after getting profile
+            await countStreams(currentUser.id)
+
         } catch (error) {
             console.log('Catch error:', error)
         } finally {
@@ -54,6 +59,48 @@ const ProfileHeader = () => {
         }
     }
     
+    const countStreams = async (userId: string) => {
+        const supabase = createClient()
+
+        // Get user's track IDs
+        const { data: userTracks, error: userTracksError } = await supabase
+            .from('user_tracks')
+            .select('track_id')
+            .eq('user_id', userId)
+
+        if (userTracksError || !userTracks) {
+            console.error('Error fetching user tracks:', userTracksError)
+            return
+        }
+
+        if (userTracks.length === 0) {
+            setTotalStreams(0)
+            setTrackCount(0)
+            return
+        }
+
+        // Get track IDs
+        const trackIds = userTracks.map((ut: any) => ut.track_id)
+        setTrackCount(trackIds.length)
+
+        // Get streams from tracks
+        const { data: tracks, error: tracksError } = await supabase
+            .from('tracks')
+            .select('spotify_streams')
+            .in('id', trackIds)
+
+        if (tracksError || !tracks) {
+            console.error('Error fetching tracks:', tracksError)
+            return
+        }
+
+        // Sum all streams
+        const total = tracks.reduce((sum: number, track: any) => {
+            return sum + (track.spotify_streams || 0)
+        }, 0)
+
+        setTotalStreams(total)
+    }
     if (loading) {
         return (
             <div className="px-12 py-6 flex justify-center items-center min-h-[300px]">
@@ -107,15 +154,21 @@ const ProfileHeader = () => {
                             </p>
                         </div>
                         <div className="flex gap-4 pt-4 border-t border-gray-200">
+                            <div className="flex-1 bg-black rounded-xl p-4">
+                                <p className="text-sm text-white mb-1">Total Streams</p>
+                                <p className="text-lg font-semibold text-white">
+                                    {totalStreams.toLocaleString()}
+                                </p>
+                            </div>
+                            <div className="flex-1 bg-gray-50 rounded-xl p-4">
+                                <p className="text-sm text-gray-500 mb-1">Tracks Produced</p>
+                                <p className="text-lg font-semibold text-gray-800">{trackCount}</p>
+                            </div>
                             <div className="flex-1 bg-gray-50 rounded-xl p-4">
                                 <p className="text-sm text-gray-500 mb-1">Member Since</p>
                                 <p className="text-lg font-semibold text-gray-800">
                                     {new Date(user.created_at).toLocaleDateString()}
                                 </p>
-                            </div>
-                            <div className="flex-1 bg-gray-50 rounded-xl p-4">
-                                <p className="text-sm text-gray-500 mb-1">Status</p>
-                                <p className="text-lg font-semibold text-green-600">Active</p>
                             </div>
                         </div>
                     </div>
