@@ -18,7 +18,7 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Track name and artist name required' }, { status: 400 })
         }
 
-        const searchQuery = `${track_name} ${artist_name} Official Audio`
+        const searchQuery = `${artist_name} - ${track_name}`
 
         const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(searchQuery)}&maxResults=1&key=${apikey}`
         const response = await fetch(url)

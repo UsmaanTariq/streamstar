@@ -2,6 +2,8 @@ import { createClient } from "@/utils/supabase/client";
 import { fetchTrackStreams } from "@/services/ApifyAPI";
 import { searchYoutubeVideo } from "@/services/YoutubeApi";
 import { createTrackLinks } from "./track_links";
+import { addTrackStreams } from "./track_streams";
+import { youtube } from "googleapis/build/src/apis/youtube";
 
 interface TrackProps {
     trackID: string
@@ -60,11 +62,10 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
             }
 
             console.log("Track saved successfully!")
-
+            const youtube = await searchYoutubeVideo(trackName, artist)
             // Create track links with YouTube
             try {
-                const youtube = await searchYoutubeVideo(trackName, artist)
-                await createTrackLinks({
+                const trackLinks = await createTrackLinks({
                     spotify_id: trackID,
                     spotify_url: spotify_url,
                     youtube_url: youtube.videoId
@@ -73,6 +74,18 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
             } catch (linkError) {
                 console.error('Error creating track links:', linkError)
                 // Continue even if links fail - track is already saved
+            }
+
+            try {
+                const addStreams = await addTrackStreams({
+                    spotify_id: trackID,
+                    spotify_url: spotify_url,
+                    youtube_url: youtube.videoId
+                })
+                console.log(addStreams)
+
+            } catch (error) {
+                console.error('Error adding track streams:', error)
             }
 
             

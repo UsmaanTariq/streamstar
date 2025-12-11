@@ -37,6 +37,7 @@ const AddButton = ({trackID, artist, albumName, releaseDate, trackName, score, s
             } else {
                 alert(result.error)
             }
+            
         } catch (error) {
             console.error('Error adding track:', error)
             alert('An unexpected error occurred')
