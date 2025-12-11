@@ -66,9 +66,9 @@ const TrackSection = () => {
             // Step 3: Get full track details from tracks table
             const { data: tracksData, error: tracksError } = await supabase
                 .from('tracks')
-                .select('*')
+                .select('*, track_streams (*)')
                 .in('id', trackIds)
-            
+
             if (tracksError) {
                 console.error('Error fetching tracks:', tracksError)
                 return
@@ -79,9 +79,17 @@ const TrackSection = () => {
                 // Use Number() to ensure consistent type comparison
                 const userTrack = userTracksData.find((ut: any) => Number(ut.track_id) === Number(track.id))
                 console.log('Track ID:', track.id, 'Found userTrack:', userTrack)
+                
+                // Get the latest track_streams entry (it's an array)
+                const latestStreams = track.track_streams && track.track_streams.length > 0 
+                    ? track.track_streams[0] 
+                    : null
+                
                 return {
                     ...track,
-                    user_track_id: userTrack?.id
+                    user_track_id: userTrack?.id,
+                    youtube_streams: latestStreams?.youtube_streams || 0,
+                    spotify_streams_updated: latestStreams?.spotify_streams || track.spotify_streams
                 }
             }) || []
 
@@ -118,6 +126,7 @@ const TrackSection = () => {
                                 release_date={track.release_date}
                                 image_url={track.image_url}
                                 user_track_id={track.user_track_id}
+                                youtube_streams={track.youtube_streams}
                             />
                         ))}
                     </div>
