@@ -4,6 +4,7 @@ import { getUser } from '@/lib/auth'
 import { createClient } from '@/utils/supabase/client'
 import Image from "next/image"
 import AvatarUpload from "./AvatarUpload"
+import { getProducerStats } from "@/lib/stats/getProducerStats"
 
 const ProfileHeader = () => {
     const [user, setUser] = useState<any>(null)
@@ -151,9 +152,6 @@ const ProfileHeader = () => {
                             <p className="text-lg text-gray-600">
                                 {user.email}
                             </p>
-                        </div>
-                        <div>
-                            <p>I am producer who specialises in drill</p>
                         </div>
                         <div className="flex gap-4 pt-4 border-t border-gray-200">
                             <div className="flex-1 bg-black rounded-xl p-4">
