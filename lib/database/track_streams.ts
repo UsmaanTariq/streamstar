@@ -64,3 +64,83 @@ export async function addTrackStreams({
         return data
     }      
 }
+
+export async function updateAllTrackStreams() {
+    const supabase = createClient()
+    
+    console.log('Starting bulk track streams update...')
+    
+    // Get all unique tracks from the tracks table
+    const { data: tracks, error: tracksError } = await supabase
+        .from('tracks')
+        .select('track_id')
+    
+    if (tracksError || !tracks) {
+        console.error('Error fetching tracks:', tracksError)
+        throw new Error('Failed to fetch tracks')
+    }
+
+    if (tracks.length === 0) {
+        console.log('No tracks found to update')
+        return { success: 0, failed: 0, skipped: 0, total: 0 }
+    }
+
+    console.log(`Found ${tracks.length} tracks to update`)
+
+    const results = {
+        success: 0,
+        failed: 0,
+        skipped: 0,
+        total: tracks.length,
+        errors: [] as Array<{ track_id: string; error: string }>
+    }
+
+    // Process each track
+    for (const track of tracks) {
+        try {
+            // Get track links for this track
+            const { data: trackLinks, error: linksError } = await supabase
+                .from('track_links')
+                .select('*')
+                .eq('spotify_id', track.track_id)
+                .maybeSingle()
+
+            if (linksError) {
+                console.error(`Error fetching links for ${track.track_id}:`, linksError)
+                results.failed++
+                results.errors.push({ 
+                    track_id: track.track_id, 
+                    error: 'Failed to fetch track links' 
+                })
+                continue
+            }
+
+            if (!trackLinks || !trackLinks.spotify_url || !trackLinks.youtube_url) {
+                console.log(`Skipping ${track.track_id} - missing links`)
+                results.skipped++
+                continue
+            }
+
+            // Update streams for this track
+            await addTrackStreams({
+                spotify_id: track.track_id,
+                spotify_url: trackLinks.spotify_url,
+                youtube_url: trackLinks.youtube_url
+            })
+
+            console.log(`✅ Updated streams for ${track.track_id}`)
+            results.success++
+
+        } catch (error: any) {
+            console.error(`❌ Error updating ${track.track_id}:`, error)
+            results.failed++
+            results.errors.push({ 
+                track_id: track.track_id, 
+                error: error.message || 'Unknown error' 
+            })
+        }
+    }
+
+    console.log('Bulk update completed:', results)
+    return results
+}

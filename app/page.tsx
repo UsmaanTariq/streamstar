@@ -1,4 +1,5 @@
 import { getSpotifyToken } from "@/services/spotifyApi";
+import UpdateStreamsButton from './components/UpdateStreamsButton'
 
 export default function Home() {
   let token = getSpotifyToken()
@@ -118,6 +119,7 @@ export default function Home() {
             <button className="px-8 py-4 bg-white text-black rounded-lg font-semibold text-lg hover:bg-zinc-200 transition-colors">
               Start Tracking Now
             </button>
+            <UpdateStreamsButton/>
           </div>
         </div>
       </main>
