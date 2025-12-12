@@ -1,9 +1,7 @@
 import { createClient } from "@/utils/supabase/client"; 
-import { fetchTrackStreams } from "@/services/ApifyAPI";
 import { searchYoutubeVideo } from "@/services/YoutubeApi";
 import { createTrackLinks } from "./track_links";
 import { addTrackStreams } from "./track_streams";
-import { youtube } from "googleapis/build/src/apis/youtube";
 
 interface TrackProps {
     trackID: string
@@ -29,7 +27,9 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
         const {data: checkData, error: checkError} = await supabase.from("tracks").select("*").eq("track_id", trackID).maybeSingle();
 
         if (checkData) {
-            console.log("Track on system")
+            console.log("Track already on system - adding to user collection and updating streams")
+            
+            // Add track to user's collection
             const {error: userTrackError} = await supabase.from('user_tracks').insert([{
                 user_id: user.id, 
                 track_id: checkData.id
@@ -39,19 +39,40 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
                 console.error('Error relating to user: ', userTrackError)
                 return { success: false, error: 'Failed to add track to your collection' }
             }
+
+            // Get track links to find YouTube URL
+            const {data: trackLinks} = await supabase
+                .from('track_links')
+                .select('*')
+                .eq('spotify_id', trackID)
+                .maybeSingle()
+
+            // Update stream data if we have the links
+            if (trackLinks && trackLinks.youtube_url) {
+                try {
+                    const streamData = await addTrackStreams({
+                        spotify_id: trackID,
+                        spotify_url: spotify_url,
+                        youtube_url: trackLinks.youtube_url
+                    })
+                    console.log('Stream data updated:', streamData)
+                } catch (streamError) {
+                    console.error('Error updating track streams:', streamError)
+                    // Don't fail - user still added track to collection
+                }
+            } else {
+                console.log('No track links found - skipping stream update')
+            }
             
             return { success: true, message: 'Track added to your collection!' }
         } else {
-            const streamData = await fetchTrackStreams(spotify_url)
-            console.log('Stream data:', streamData)
-
+            // Save track first (streams will be added separately)
             const {data: uploadedTrack, error } = await supabase.from("tracks").insert([{
                 track_id: trackID,
                 artist_name: artist,
                 album_name: albumName,
                 track_name: trackName,
                 popularity: score,
-                spotify_streams: streamData.streamCount,
                 image_url: image_url,
                 release_date: releaseDate
             }]).select().single()
@@ -62,30 +83,40 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
             }
 
             console.log("Track saved successfully!")
+            
+            // Search for YouTube video
             const youtube = await searchYoutubeVideo(trackName, artist)
-            // Create track links with YouTube
-            try {
-                const trackLinks = await createTrackLinks({
-                    spotify_id: trackID,
-                    spotify_url: spotify_url,
-                    youtube_url: youtube.videoId
-                })
-                console.log("Track links created successfully!")
-            } catch (linkError) {
-                console.error('Error creating track links:', linkError)
-                // Continue even if links fail - track is already saved
-            }
+            
+            // Validate YouTube data
+            if (!youtube || !youtube.videoId) {
+                console.error('YouTube video not found')
+                // Continue without YouTube data
+            } else {
+                // Create track links with YouTube
+                try {
+                    const trackLinks = await createTrackLinks({
+                        spotify_id: trackID,
+                        spotify_url: spotify_url,
+                        youtube_url: youtube.videoId
+                    })
+                    console.log("Track links created successfully!")
+                } catch (linkError) {
+                    console.error('Error creating track links:', linkError)
+                    // Continue even if links fail - track is already saved
+                }
 
-            try {
-                const addStreams = await addTrackStreams({
-                    spotify_id: trackID,
-                    spotify_url: spotify_url,
-                    youtube_url: youtube.videoId
-                })
-                console.log(addStreams)
-
-            } catch (error) {
-                console.error('Error adding track streams:', error)
+                // Add stream data
+                try {
+                    const addStreams = await addTrackStreams({
+                        spotify_id: trackID,
+                        spotify_url: spotify_url,
+                        youtube_url: youtube.videoId
+                    })
+                    console.log('Stream data added:', addStreams)
+                } catch (streamError) {
+                    console.error('Error adding track streams:', streamError)
+                    // Continue even if streams fail - track is already saved
+                }
             }
 
             

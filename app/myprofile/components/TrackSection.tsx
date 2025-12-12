@@ -103,6 +103,11 @@ const TrackSection = () => {
         }
     }
 
+    // Handle track deletion by removing from state
+    const handleTrackDeleted = (user_track_id: number) => {
+        setData(prevData => prevData.filter(track => track.user_track_id !== user_track_id))
+    }
+
 
     return (
         <>
@@ -122,11 +127,12 @@ const TrackSection = () => {
                                 created_at={track.created_at} 
                                 artist_name={track.artist_name}
                                 popularity={track.popularity}
-                                streams={track.spotify_streams}
+                                streams={track.spotify_streams_updated}
                                 release_date={track.release_date}
                                 image_url={track.image_url}
                                 user_track_id={track.user_track_id}
                                 youtube_streams={track.youtube_streams}
+                                onDelete={handleTrackDeleted}
                             />
                         ))}
                     </div>
