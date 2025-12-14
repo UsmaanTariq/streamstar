@@ -12,6 +12,7 @@ const ProfileHeader = () => {
     const [profile, setProfile] = useState<any>(null)
     const [totalStreams, setTotalStreams] = useState<number>(0)
     const [trackCount, setTrackCount] = useState<number>(0)
+    const [userStats, setUserStats] = useState<any>(null)
 
     useEffect(() => {
         // Check user on mount
@@ -51,8 +52,8 @@ const ProfileHeader = () => {
             console.log('Profile data:', data)
             setProfile(data)
 
-            // Count streams after getting profile
-            await countStreams(currentUser.id)
+            const stats = await getProducerStats(currentUser.id)
+            setUserStats(stats)
 
         } catch (error) {
             console.log('Catch error:', error)
@@ -157,12 +158,12 @@ const ProfileHeader = () => {
                             <div className="flex-1 bg-black rounded-xl p-4">
                                 <p className="text-sm text-white mb-1">Total Streams</p>
                                 <p className="text-lg font-semibold text-white">
-                                    {totalStreams.toLocaleString()}
+                                    {userStats?.totalStreams?.total?.toLocaleString() || '0'}
                                 </p>
                             </div>
                             <div className="flex-1 bg-gray-50 rounded-xl p-4">
                                 <p className="text-sm text-gray-500 mb-1">Tracks Produced</p>
-                                <p className="text-lg font-semibold text-gray-800">{trackCount}</p>
+                                <p className="text-lg font-semibold text-gray-800">{userStats?.trackCount || trackCount}</p>
                             </div>
                             <div className="flex-1 bg-gray-50 rounded-xl p-4">
                                 <p className="text-sm text-gray-500 mb-1">Member Since</p>
