@@ -1,3 +1,4 @@
+'use client'
 import { getProducerStats } from "@/lib/stats/getProducerStats";
 import Navbar from "../components/navbar";
 import ProfileHeader from "./components/ProfileHeader";
@@ -5,9 +6,10 @@ import TrackSection from "./components/TrackSection";
 import { createClient } from "@/utils/supabase/client";
 import ProfileInsight from "./components/ProfileInsight";
 import ProfileSidebar from "./components/ProfileSidebar";
-
+import { useState } from "react";
 
 export default function MyProfile() {
+    const [activeTab, setActiveTab] = useState<'tracks' | 'insights' | 'breakdown'>('tracks')
 
     return (
         <>
