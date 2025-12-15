@@ -12,9 +12,11 @@ interface TrackProps {
     score: number
     spotify_url: string
     image_url: string
+    role: string[]
+    notes?: string
 }
 
-export async function createTrack({trackID, artist, albumName, releaseDate, trackName, score, image_url, spotify_url} : TrackProps) {
+export async function createTrack({trackID, artist, albumName, releaseDate, trackName, score, image_url, spotify_url, role, notes} : TrackProps) {
     try {
         const supabase = createClient()
         const {data: {user}, error: userError} = await supabase.auth.getUser()
@@ -32,7 +34,9 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
             // Add track to user's collection
             const {error: userTrackError} = await supabase.from('user_tracks').insert([{
                 user_id: user.id, 
-                track_id: checkData.id
+                track_id: checkData.id,
+                role: role,
+                notes: notes || null
             }])
 
             if (userTrackError) {
@@ -122,7 +126,9 @@ export async function createTrack({trackID, artist, albumName, releaseDate, trac
             
             const {error: userTrackError} = await supabase.from('user_tracks').insert([{
                 user_id: user.id, 
-                track_id: uploadedTrack.id
+                track_id: uploadedTrack.id,
+                role: role,
+                notes: notes || null
             }])
 
             if (userTrackError) {

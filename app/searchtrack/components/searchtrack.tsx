@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { searchTrack } from '@/services/spotifyApi'
 import { convertSegmentPathToStaticExportFilename } from 'next/dist/shared/lib/segment-cache/segment-value-encoding'
 import AddButton from './addtrack'
-
+import Image from 'next/image'
 const SearchTrack = () => {
     const extractTracks = async () => {
         const supabase = createClient()
@@ -79,10 +79,12 @@ const SearchTrack = () => {
                                         className="flex items-center gap-4 p-4 bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
                                     >
                                         {track.album?.images && track.album.images[0] && (
-                                            <img 
+                                            <Image
                                                 src={track.album.images[0].url} 
                                                 alt={track.name}
-                                                className="w-16 h-16 rounded object-cover"
+                                                className="h-16 w-16 rounded object-cover"
+                                                height={64}
+                                                width={64}
                                             />
                                         )}
                                         <div className="flex-1">
