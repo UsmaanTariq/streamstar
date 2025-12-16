@@ -42,15 +42,19 @@ const ProfileInsight = () => {
     }
 
     const getUserStats = async () => {
-        if (!user?.id) return
-        
+        if (!user?.id) return;
+        setLoading(true);
+      
+        let cancelled = false;
         try {
-            const userData = await getProducerStats(user.id)
-            setUserStats(userData)
-        } catch (error) {
-            console.error('Error getting user stats:', error)
+          const userData = await getProducerStats(user.id);
+          if (!cancelled) setUserStats(userData);
+        } finally {
+          if (!cancelled) setLoading(false);
         }
-    }
+      
+        return () => { cancelled = true; };
+      };
 
     if (loading) {
         return (
@@ -198,7 +202,7 @@ const ProfileInsight = () => {
                                             <XAxis 
                                                 dataKey="role"
                                                 angle={0}
-                                                textAnchor="end"
+
                                                 height={70}
                                                 interval={0}
                                                 tick={{ fontSize: 12 }}
@@ -264,7 +268,7 @@ const ProfileInsight = () => {
                                             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                                         }}
                                         tick={{ fontSize: 11 }}
-                                        angle={-15}
+                                        angle={0}
                                         textAnchor="end"
                                         height={60}
                                     />
