@@ -3,8 +3,6 @@ import UpdateStreamsButton from './components/UpdateStreamsButton'
 import Navbar from "./components/navbar";
 
 export default function Home() {
-  let token = getSpotifyToken()
-  console.log(token)
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}

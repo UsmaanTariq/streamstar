@@ -12,3 +12,4 @@ async function uploadFile({file}: {file:string}) {
     // Handle success
   }
 }
+

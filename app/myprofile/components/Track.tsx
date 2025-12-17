@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import DeleteButton from './DeleteButton'
+import EditTrack from './EditTrack'
 
 interface TrackProps {
     track_name: string
@@ -16,7 +17,6 @@ interface TrackProps {
     notes: string
     onDelete?: (user_track_id: number) => void
 }
-
 const Track = ({ track_name, artist_name, album_name, popularity, streams, release_date, image_url, user_track_id, youtube_streams, role, notes, onDelete }: TrackProps) => {
     const formattedStreams = streams?.toLocaleString() || '0'
     const formattedYoutubeStreams = youtube_streams?.toLocaleString() || '0'
@@ -100,6 +100,14 @@ const Track = ({ track_name, artist_name, album_name, popularity, streams, relea
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </button>
+                <EditTrack user_track_id={user_track_id}
+                    artist={artist_name}
+                    trackName={track_name}
+                    albumName={album_name}
+                    releaseDate={release_date}
+                    role={role}
+                    imageUrl={image_url}
+                />
             </div>
         </div>
     )
