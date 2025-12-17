@@ -4,59 +4,12 @@ import { createClient } from "@/utils/supabase/client"
 import { getUser } from "@/lib/auth"
 import { getProducerStats } from "@/lib/stats/getProducerStats"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, XAxis, YAxis, Bar, AreaChart, Area } from 'recharts'
+import { useProfileInsights } from "@/hooks/useProfileInsight"
+import StreamsByArtist from "./graphs/StreamsByArtist"
 
 const ProfileInsight = () => {
-    const [user, setUser] = useState<any>(null)
-    const [loading, setLoading] = useState(true)
-    const [userStats, setUserStats] = useState<any>(null)
-
-    useEffect(() => {
-        // Check user on mount
-        checkUser()
-
-        // Listen for auth changes
-        const supabase = createClient()
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null)
-        })
-
-        return () => subscription.unsubscribe()
-    }, [])
-
-    useEffect(() => {
-        // Get stats when user is loaded
-        if (user?.id) {
-            getUserStats()
-        }
-    }, [user])
-
-    const checkUser = async () => {
-        try {
-            const currentUser = await getUser()
-            setUser(currentUser)
-        } catch (error) {
-            console.error('Error checking user:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const getUserStats = async () => {
-        if (!user?.id) return;
-        setLoading(true);
-      
-        let cancelled = false;
-        try {
-          const userData = await getProducerStats(user.id);
-          console.log(userData)
-          if (!cancelled) setUserStats(userData);
-        } finally {
-          if (!cancelled) setLoading(false);
-        }
-        
-      
-        return () => { cancelled = true; };
-      };
+    const { user, userStats, loading, error} = useProfileInsights()
+    console.log(userStats)
 
     if (loading) {
         return (
@@ -323,6 +276,9 @@ const ProfileInsight = () => {
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
+                    )}
+                    {userStats?.streamsByArtist && userStats.streamsByArtist.length > 0 && (
+                        <StreamsByArtist streamsByArtist={userStats.streamsByArtist} />
                     )}
                 </div>
             </div>
