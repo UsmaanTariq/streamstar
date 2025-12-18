@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { updateAllTrackStreams } from '@/lib/database/track_streams'
+import { createAdminClient } from '@/utils/supabase/server'
 
 // Increase timeout for this route (Vercel Pro/Enterprise only)
 export const maxDuration = 60 // seconds (requires paid plan)
@@ -14,12 +15,15 @@ export async function POST(request: Request) {
 
         console.log('Starting stream update via API...')
         
+        // Create admin client that bypasses RLS
+        const adminClient = createAdminClient()
+        
         // Add timeout wrapper
         const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('Update timeout - consider processing in smaller batches')), 55000) // 55 seconds
         })
 
-        const updatePromise = updateAllTrackStreams()
+        const updatePromise = updateAllTrackStreams(adminClient)
 
         // Race between update and timeout
         const results = await Promise.race([updatePromise, timeoutPromise]) as any

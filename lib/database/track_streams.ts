@@ -7,13 +7,15 @@ import { getCurrentDateFormatted } from "@/helper/helperFunctions"
 export async function addTrackStreams({
     spotify_id, 
     spotify_url, 
-    youtube_url
+    youtube_url,
+    supabaseClient
 }: {
     spotify_id: string
     spotify_url: string
     youtube_url: string
+    supabaseClient?: any
 }) {
-    const supabase = createClient()  
+    const supabase = supabaseClient || createClient()  
 
     const date = getCurrentDateFormatted();
     const {data: todayExisting} = await supabase.from('track_streams')
@@ -106,7 +108,8 @@ async function processBatch(
                 await addTrackStreams({
                     spotify_id: track.track_id,
                     spotify_url: trackLinks.spotify_url,
-                    youtube_url: trackLinks.youtube_url
+                    youtube_url: trackLinks.youtube_url,
+                    supabaseClient: supabase
                 })
 
                 console.log(`✅ Updated streams for ${track.track_id}`)
@@ -148,8 +151,8 @@ async function processBatch(
     return results
 }
 
-export async function updateAllTrackStreams() {
-    const supabase = createClient()
+export async function updateAllTrackStreams(supabaseClient?: any) {
+    const supabase = supabaseClient || createClient()
     
     console.log('Starting bulk track streams update...')
     

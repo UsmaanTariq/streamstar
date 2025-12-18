@@ -28,13 +28,13 @@ const ProfileInsight = () => {
     return (
         <>
             <div className="flex justify-center bg-[#DFE0E2]">
-                <div className="flex flex-col p-8 max-w-12xl w-full  bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg overflow-hidden">
+                <div className="flex flex-col p-8 max-w-12xl w-full  bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg overflow-hidden border-gray-300 border-1">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Insights</h2>
                     
                     {userStats?.totalStreams?.total > 0 ? (
                         <div className="flex items-center gap-8">
                             <ResponsiveContainer width="50%" height={300}>
-                                <PieChart className="bg-white shadow-lg rounded-lg">
+                                <PieChart className="bg-white shadow-lg rounded-lg border-1 border-gray-200">
                                     <Pie
                                         data={[
                                             { name: 'Spotify', value: userStats.totalStreams.spotify },
@@ -90,10 +90,19 @@ const ProfileInsight = () => {
                                 </div>
 
                                 <div className="rounded-lg p-4 shadow bg-white ">
-                                <p className="text-sm text-gray-500">Total Streams</p>
-                                    <p className="text-2xl font-bold text-gray-800">
-                                        {userStats.totalStreams.total.toLocaleString()}
-                                    </p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                                            <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div className="flex=1">
+                                        <p className="text-sm text-gray-500">Total Streams</p>
+                                            <p className="text-2xl font-bold text-gray-800">
+                                                {userStats.totalStreams.total.toLocaleString()}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

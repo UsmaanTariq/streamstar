@@ -1,17 +1,17 @@
 'use client'
 import { useState } from "react"
-import { Music, PieChart, BarChart3 } from 'lucide-react'
+import { Music, PieChart, BarChart3, TargetIcon } from 'lucide-react'
 
 interface ProfileSidebarProps {
-    activeTab: 'tracks' | 'insights' | 'breakdown'
-    setActiveTab: (tab: 'tracks' | 'insights' | 'breakdown') => void
+    activeTab: 'tracks' | 'insights' | 'breakdown' | 'goals'
+    setActiveTab: (tab: 'tracks' | 'insights' | 'breakdown' | 'goals') => void
 }
 
 const ProfileSidebar = ({activeTab, setActiveTab}: ProfileSidebarProps) => {
     return (
         <>
             <div className="w-90 flex=shrink-0">
-                <div className='flex flex-col p-8 gap-2 shadow-lg sticky top-6 min-h-screen'>
+                <div className='flex flex-col p-8 gap-2 shadow-lg sticky top-6 min-h-screen border-gray-300 border-1'>
                     <h1 className='mb-4 text-xl'>Your Dashboard</h1>
                 <button
                     onClick={() => setActiveTab('tracks')}
@@ -45,6 +45,17 @@ const ProfileSidebar = ({activeTab, setActiveTab}: ProfileSidebarProps) => {
                 >
                     <BarChart3 className="w-5 h-5" />
                     Track breakdown
+                </button>
+                <button
+                    onClick={() => setActiveTab('goals')}
+                    className={`w-full text-left p-4 rounded-lg font-medium transition-all flex items-center gap-3 ${
+                        activeTab === 'goals'
+                            ? 'bg-black text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-100'
+                    }`}
+                >
+                    <TargetIcon className='w-5 h-5' />
+                    Goals
                 </button>
 
                 </div>

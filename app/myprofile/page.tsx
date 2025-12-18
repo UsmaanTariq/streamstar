@@ -7,9 +7,10 @@ import { createClient } from "@/utils/supabase/client";
 import ProfileInsight from "./components/ProfileInsight";
 import ProfileSidebar from "./components/ProfileSidebar";
 import { useState } from "react";
+import Goals from "./components/goals/Goals";
 
 export default function MyProfile() {
-    const [activeTab, setActiveTab] = useState<'tracks' | 'insights' | 'breakdown'>('tracks')
+    const [activeTab, setActiveTab] = useState<'tracks' | 'insights' | 'breakdown'| 'goals'>('tracks')
 
     return (
         <>
@@ -21,6 +22,7 @@ export default function MyProfile() {
                     <div className="flex-1">
                         {activeTab === 'tracks' && <TrackSection />}
                         {activeTab === 'insights' && <ProfileInsight />}
+                        {activeTab === 'goals' && <Goals />}
                     </div>
                 </div>
 
