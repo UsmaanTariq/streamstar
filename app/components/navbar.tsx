@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { getUser, signOut } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { ChartAreaIcon } from 'lucide-react'
 
 export default function Navbar() {
     const router = useRouter()
@@ -53,9 +54,10 @@ export default function Navbar() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-white rounded-xl blur-sm opacity-20 group-hover:opacity-30 transition-opacity"></div>
                         <div className="relative w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
-                            <svg className="w-6 h-6 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {/* <svg className="w-6 h-6 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                            </svg>
+                            </svg> */}
+                            <ChartAreaIcon />
                         </div>
                     </div>
                     <span className="text-xl font-bold text-white">
