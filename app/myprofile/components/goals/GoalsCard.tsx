@@ -20,7 +20,6 @@ const GoalsCard = ({
     goalType = ''
 }: GoalsCardProps) => {
     // Calculate progress percentage
-    updateGoalProgress('e2c08d5a-3463-4614-8775-5610e1ed44fa', '0d41d235-5072-45a8-8233-fedc6b84a223')
     const progressPercentage = targetValue > 0 ? Math.min((currentValue / targetValue) * 100, 100) : 0
     
     return (
