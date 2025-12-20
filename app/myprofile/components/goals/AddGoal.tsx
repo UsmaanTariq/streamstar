@@ -13,6 +13,7 @@ const AddGoal = () => {
     const [periodStart, setPeriodStart] = useState('')
     const [periodEnd, setPeriodEnd] = useState('')
     const [progressSource, setProgressSource] = useState('')
+    const [target, setTarget] = useState(0)
     
     const handleModal = () => {
         setModal(true)
@@ -30,7 +31,8 @@ const AddGoal = () => {
                 periodType,
                 periodStart,
                 periodEnd,
-                progressSource
+                progressSource,
+                target
             })
 
             alert('Goal created successfully!')
@@ -42,6 +44,7 @@ const AddGoal = () => {
             setPeriodStart('')
             setPeriodEnd('')
             setProgressSource('')
+            setTarget(0)
             setModal(false)
         } catch (error: any) {
             console.error('Error:', error)
@@ -107,6 +110,21 @@ const AddGoal = () => {
                                     onChange={(e) => setTitle(e.target.value)}
                                     required
                                     placeholder="e.g., Reach 1 Million Total Streams"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+                            {/* Target */}
+                            <div>
+                                <label htmlFor="target" className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Target <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="target"
+                                    value={target}
+                                    onChange={(e) => setTarget(parseInt(e.target.value))}
+                                    required
+                                    placeholder="e.g., 10"
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>

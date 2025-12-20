@@ -8,6 +8,7 @@ interface CreateGoalProps {
     periodStart: string
     periodEnd: string
     progressSource: string
+    target: number
 }
 
 export async function createGoal({
@@ -17,7 +18,8 @@ export async function createGoal({
     periodType,
     periodStart,
     periodEnd,
-    progressSource
+    progressSource,
+    target
 }: CreateGoalProps) {
     const supabase = createClient()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -37,6 +39,7 @@ export async function createGoal({
             period_start: periodStart,
             period_end: periodEnd,
             progress_source: progressSource,
+            target_value: target,
             updated_at: new Date().toISOString()
         })
         .select()

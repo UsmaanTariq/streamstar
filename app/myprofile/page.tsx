@@ -7,6 +7,7 @@ import ProfileSidebar from "./components/ProfileSidebar";
 import { useState } from "react";
 import Goals from "./components/goals/Goals";
 import { useProfileInsights } from "@/hooks/useProfileInsight";
+import TrackBreakdown from "./components/trackbreakdown/TrackBreakdown";
 
 export default function MyProfile() {
     const [activeTab, setActiveTab] = useState<'tracks' | 'insights' | 'breakdown'| 'goals'>('tracks')
@@ -25,6 +26,7 @@ export default function MyProfile() {
                         {activeTab === 'tracks' && <TrackSection />}
                         {activeTab === 'insights' && <ProfileInsight userStats={userStats} loading={loading} error={error} />}
                         {activeTab === 'goals' && <Goals />}
+                        {activeTab === 'breakdown' && <TrackBreakdown />}
                     </div>
                 </div>
 
