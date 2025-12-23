@@ -121,10 +121,12 @@ const TrackSection = () => {
                     <div className="flex justify-between mb-2">
                         <h1 className="text-2xl font-bold">Your Credits</h1>
                     </div>
-                    <p className="text-gray-400">Tracks you've been a part of</p>
+                    <p className="text-gray-500">Tracks you've made, produced, or have credits on</p>
                     <div className="my-6 grid grid-cols-4 gap-4">
                         <div className="flex gap-4 bg-white p-4 rounded-lg items-center max-w-3xl w-full shadow-lg">
-                            <Disc2Icon className=""/>
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <Disc2Icon color="#267082"/>
+                            </div>
                             <div className="flex flex-col">
                                 <h1 className="text-xl font-bold">{data.length}</h1>
                                 <p className="text-gray-500">Total Credits</p>

@@ -6,8 +6,15 @@ import { createClient } from '@/utils/supabase/client'
 import { getUser } from '@/lib/auth'
 import { getProducerStats } from '@/lib/stats/getProducerStats'
 
+type UserProfile = {
+  user_name: string
+  avatar_url: string | null
+  email: string
+}
+
 type UseProfileInsightsResult = {
   user: any | null
+  userProfile: UserProfile | null
   userStats: any | null
   loading: boolean
   error: string | null
@@ -18,6 +25,7 @@ export function useProfileInsights(): UseProfileInsightsResult {
   const supabase = useMemo(() => createClient(), [])
 
   const [user, setUser] = useState<any | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [userStats, setUserStats] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -50,17 +58,32 @@ export function useProfileInsights(): UseProfileInsightsResult {
     }
   }, [supabase])
 
-  // 2) Fetch stats whenever user.id changes
+  // 2) Fetch stats and profile whenever user.id changes
   const fetchStats = async (userId: string) => {
     setError(null)
     setLoading(true)
     try {
-      const data = await getProducerStats(userId)
-      setUserStats(data)
-      console.log(userStats)
+      // Fetch both stats and profile in parallel
+      const [statsData, profileData] = await Promise.all([
+        getProducerStats(userId),
+        supabase
+          .from('users')
+          .select('user_name, avatar_url, email')
+          .eq('user_id', userId)
+          .single()
+      ])
+      
+      setUserStats(statsData)
+      
+      if (profileData.error) {
+        console.error('Error fetching profile:', profileData.error)
+      } else {
+        setUserProfile(profileData.data)
+      }
     } catch (e: any) {
       setError(e?.message ?? 'Failed to load stats')
       setUserStats(null)
+      setUserProfile(null)
     } finally {
       setLoading(false)
     }
@@ -69,6 +92,7 @@ export function useProfileInsights(): UseProfileInsightsResult {
   useEffect(() => {
     if (!user?.id) {
       setUserStats(null)
+      setUserProfile(null)
       return
     }
 
@@ -78,8 +102,25 @@ export function useProfileInsights(): UseProfileInsightsResult {
 
     ;(async () => {
       try {
-        const data = await getProducerStats(user.id)
-        if (!cancelled) setUserStats(data)
+        // Fetch both stats and profile in parallel
+        const [statsData, profileData] = await Promise.all([
+          getProducerStats(user.id),
+          supabase
+            .from('users')
+            .select('user_name, avatar_url, email')
+            .eq('user_id', user.id)
+            .single()
+        ])
+
+        if (!cancelled) {
+          setUserStats(statsData)
+          
+          if (profileData.error) {
+            console.error('Error fetching profile:', profileData.error)
+          } else {
+            setUserProfile(profileData.data)
+          }
+        }
       } catch (e: any) {
         if (!cancelled) setError(e?.message ?? 'Failed to load stats')
       } finally {
@@ -90,10 +131,11 @@ export function useProfileInsights(): UseProfileInsightsResult {
     return () => {
       cancelled = true
     }
-  }, [user?.id])
+  }, [user?.id, supabase])
 
   return {
     user,
+    userProfile,
     userStats,
     loading,
     error,

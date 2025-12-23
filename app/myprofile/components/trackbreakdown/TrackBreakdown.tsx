@@ -76,7 +76,7 @@ const TrackBreakdown = () => {
                         const totalMinVal = totalValues.length ? Math.min(...totalValues) : 0
                         const totalMaxVal = totalValues.length ? Math.max(...totalValues) : 0
                         const totalRange = Math.max(1, totalMaxVal - totalMinVal)
-                        const totalPadding = totalRange * 0.1
+                        const totalPadding = totalRange * 0.05
                         const totalYMin = Math.max(0, totalMinVal - totalPadding)
                         const totalYMax = totalMaxVal + totalPadding
 

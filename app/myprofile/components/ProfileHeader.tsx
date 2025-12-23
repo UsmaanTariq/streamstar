@@ -7,13 +7,17 @@ import AvatarUpload from "./AvatarUpload"
 
 interface ProfileHeaderProps {
     userStats?: any
+    userProfile?: {
+        user_name: string
+        avatar_url: string | null
+        email: string
+    } | null
     loading?: boolean
 }
 
-const ProfileHeader = ({ userStats, loading: statsLoading }: ProfileHeaderProps) => {
+const ProfileHeader = ({ userStats, userProfile, loading: statsLoading }: ProfileHeaderProps) => {
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
-    const [profile, setProfile] = useState<any>(null)
 
     useEffect(() => {
         // Check user on mount
@@ -32,27 +36,6 @@ const ProfileHeader = ({ userStats, loading: statsLoading }: ProfileHeaderProps)
         try {
             const currentUser = await getUser()
             setUser(currentUser)
-
-            if (!currentUser) {
-                console.log('No user found')
-                return
-            }
-
-            const supabase = createClient()
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .single()
-
-            if (error) {
-                console.error('Error fetching profile:', error)
-                return
-            }
-
-            console.log('Profile data:', data)
-            setProfile(data)
-
         } catch (error) {
             console.log('Catch error:', error)
         } finally {
@@ -85,8 +68,11 @@ const ProfileHeader = ({ userStats, loading: statsLoading }: ProfileHeaderProps)
                             <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20"></div>
                             <AvatarUpload 
                                 userId={user.id} 
-                                currentAvatarUrl={profile?.avatar_url}
-                                onUploadComplete={(url) => setProfile({ ...profile, avatar_url: url })}
+                                currentAvatarUrl={userProfile?.avatar_url || undefined}
+                                onUploadComplete={(url) => {
+                                    // Avatar updated, will be refreshed on next load
+                                    console.log('Avatar updated:', url)
+                                }}
                             />
                         </div>
                         <div className="text-center">
@@ -94,7 +80,7 @@ const ProfileHeader = ({ userStats, loading: statsLoading }: ProfileHeaderProps)
                                 Producer
                             </h3>
                             <p className="text-xl font-bold text-gray-800">
-                                {profile ? profile.user_name : 'Loading...'}
+                                {userProfile ? userProfile.user_name : 'Loading...'}
                             </p>
                         </div>
                     </div>
@@ -104,10 +90,10 @@ const ProfileHeader = ({ userStats, loading: statsLoading }: ProfileHeaderProps)
                                 Profile Information
                             </h2>
                             <h1 className="text-4xl font-bold text-gray-900 mb-1">
-                                {profile ? profile.user_name : 'Welcome'}
+                                {userProfile ? userProfile.user_name : 'Welcome'}
                             </h1>
                             <p className="text-lg text-gray-600">
-                                {user.email}
+                                {userProfile?.email || user?.email}
                             </p>
                         </div>
                         <div className="flex gap-4 pt-4 border-t border-gray-200">

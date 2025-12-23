@@ -13,13 +13,13 @@ export default function MyProfile() {
     const [activeTab, setActiveTab] = useState<'tracks' | 'insights' | 'breakdown'| 'goals'>('tracks')
     
     // Fetch stats once at the page level
-    const { user, userStats, loading, error } = useProfileInsights()
+    const { user, userProfile, userStats, loading, error } = useProfileInsights()
 
     return (
         <>
             <Navbar />
             <div className="flex flex-col min-h-screen">
-                <ProfileHeader userStats={userStats} loading={loading} />
+                <ProfileHeader userStats={userStats} userProfile={userProfile} loading={loading} />
                 <div className = 'flex px-12 py-6 '>
                     <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab}/>
                     <div className="flex-1">
