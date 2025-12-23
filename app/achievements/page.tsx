@@ -6,11 +6,12 @@ import { useProfileInsights } from "@/hooks/useProfileInsight"
 import Navbar from "../components/navbar"
 import Totals from "./components/totals"
 import UserInfo from "./components/UserInfo"
+import TopTracksCard from "./components/TopTracksCard"
 
 export default function ProducerWrapped() {
     const { user, userProfile, userStats, loading, error } = useProfileInsights()
 
-    const topTracks = userStats?.topTracks?.[0]
+    const topTracks = userStats?.topTracks || []
     const totalStreams = userStats?.totalStreams?.total || 0
     const spotifyStreams = userStats?.totalStreams?.spotify || 0
     const youtubeStreams = userStats?.totalStreams?.youtube || 0
@@ -56,14 +57,21 @@ export default function ProducerWrapped() {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
-                <div className="container mx-auto px-4 max-w-7xl">
+
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 py-8 flex items-center justify-center mx-5">
+                <div className="container mx-auto px-4 w-25/100">
+                    <TopTracksCard topTracks={topTracks}/>
+                </div>
+                <div className="container mx-auto px-4 w-50/100">
                     <UserInfo userProfile={userProfile} />
                     <Totals 
                         totalStreams={totalStreams} 
                         youtubeStreams={youtubeStreams} 
                         spotifyStreams={spotifyStreams}
                     />
+                </div>
+                <div className="container mx-auto px-4 w-25/100">
+                    <TopTracksCard topTracks={topTracks}/>
                 </div>
             </div>
         </>
