@@ -9,7 +9,7 @@ import { getYouTubeViews } from '@/services/YoutubeApi'
 export const maxDuration = 60 // Max 60 seconds on Vercel
 
 // Number of tracks to process per cron run
-const BATCH_SIZE = 3
+const BATCH_SIZE = 6
 
 export async function GET(request: Request) {
     try {
@@ -39,6 +39,7 @@ export async function GET(request: Request) {
 
         const updatedTrackIds = updatedToday?.map(t => t.track_id) || []
         console.log(`[CRON] ${updatedTrackIds.length} tracks already updated today`)
+        console.log(`[CRON] Updated track IDs:`, updatedTrackIds)
 
         // Step 2: Get tracks that haven't been updated today
         let tracksQuery = supabase
@@ -78,7 +79,7 @@ export async function GET(request: Request) {
             // Process this batch
             const results = await processBatch(pendingTracks, supabase, today)
             
-            const remainingCount = (allTracks?.length || 0) - updatedTrackIds.length - results.success
+            const remainingCount = (allTracks?.length || 0) - updatedTrackIds.length - results.successCount
             
             return NextResponse.json({
                 success: true,
@@ -117,7 +118,7 @@ export async function GET(request: Request) {
                 success: true,
                 message: `Batch processed successfully`,
                 ...results,
-                remaining: (totalCount || 0) - results.success,
+                remaining: (totalCount || 0) - results.successCount,
                 totalTracks: totalCount || 0,
                 nextRunIn: '15 minutes'
             })
@@ -138,10 +139,11 @@ async function processBatch(
     today: string
 ) {
     const results = {
-        success: 0,
-        failed: 0,
-        skipped: 0,
+        successCount: 0,
+        failedCount: 0,
+        skippedCount: 0,
         processed: [] as string[],
+        skippedTracks: [] as string[],
         errors: [] as Array<{ track_id: string; error: string }>
     }
 
@@ -160,14 +162,15 @@ async function processBatch(
 
             if (linksError) {
                 console.error(`[CRON] Error fetching links for ${track.track_id}:`, linksError)
-                results.failed++
+                results.failedCount++
                 results.errors.push({ track_id: track.track_id, error: 'Failed to fetch track links' })
                 continue
             }
 
             if (!trackLinks?.spotify_url || !trackLinks?.youtube_url) {
-                console.log(`[CRON] Skipping ${track.track_name} - missing URLs`)
-                results.skipped++
+                console.log(`[CRON] ⏭️ Skipping ${track.track_name} (${track.track_id}) - missing URLs. Has spotify: ${!!trackLinks?.spotify_url}, Has youtube: ${!!trackLinks?.youtube_url}`)
+                results.skippedCount++
+                results.skippedTracks.push(`${track.track_name} (missing URLs)`)
                 continue
             }
 
@@ -180,8 +183,9 @@ async function processBatch(
                 .maybeSingle()
 
             if (existingToday) {
-                console.log(`[CRON] Skipping ${track.track_name} - already updated`)
-                results.skipped++
+                console.log(`[CRON] ⏭️ Skipping ${track.track_name} - already updated today`)
+                results.skippedCount++
+                results.skippedTracks.push(`${track.track_name} (already updated)`)
                 continue
             }
 
@@ -214,7 +218,7 @@ async function processBatch(
 
             if (insertError) {
                 console.error(`[CRON] Insert failed for ${track.track_name}:`, insertError)
-                results.failed++
+                results.failedCount++
                 results.errors.push({ track_id: track.track_id, error: insertError.message })
                 continue
             }
@@ -222,12 +226,12 @@ async function processBatch(
             const elapsed = Date.now() - startTime
             console.log(`[CRON] ✅ Updated ${track.track_name} (Spotify: ${spotifyStreams}, YouTube: ${youtubeStreams}) in ${elapsed}ms`)
             
-            results.success++
+            results.successCount++
             results.processed.push(track.track_name)
 
         } catch (error: any) {
             console.error(`[CRON] Error processing ${track.track_name}:`, error)
-            results.failed++
+            results.failedCount++
             results.errors.push({ track_id: track.track_id, error: error.message })
         }
     }
