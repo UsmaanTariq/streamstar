@@ -113,6 +113,10 @@ const TrackSection = () => {
         setData(prevData => prevData.filter(track => track.user_track_id !== user_track_id))
     }
 
+    // Calculate total streams from all tracks
+    const totalSpotifyStreams = data.reduce((sum, track) => sum + (track.spotify_streams_updated || 0), 0)
+    const totalYoutubeStreams = data.reduce((sum, track) => sum + (track.youtube_streams || 0), 0)
+    const totalStreams = totalSpotifyStreams + totalYoutubeStreams
 
     return (
         <>
@@ -139,7 +143,7 @@ const TrackSection = () => {
                                 </svg>
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-xl font-bold">1,000,000</h1>
+                                <h1 className="text-xl font-bold">{totalSpotifyStreams.toLocaleString()}</h1>
                                 <p className="text-gray-500">Spotify Streams</p>
                             </div>
                         </div>
@@ -150,7 +154,7 @@ const TrackSection = () => {
                                 </svg>
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-xl font-bold">1,000,000</h1>
+                                <h1 className="text-xl font-bold">{totalYoutubeStreams.toLocaleString()}</h1>
                                 <p className="text-gray-500">Youtube Views</p>
                             </div>
                         </div>
@@ -159,7 +163,7 @@ const TrackSection = () => {
                                 <TrendingUpIcon color="#854bb4"/>
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-xl font-bold">1,000,000</h1>
+                                <h1 className="text-xl font-bold">{totalStreams.toLocaleString()}</h1>
                                 <p className="text-gray-500">Total Plays</p>
                             </div>
                         </div>
