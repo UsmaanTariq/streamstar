@@ -13,6 +13,7 @@ export interface ProducerStats {
         total_streams: number
         spotify_streams: number
         youtube_streams: number
+        image_url: string
     }>
     streamsByRole: Array<{
         role: string
@@ -118,7 +119,8 @@ function calculateStats(tracks: any[], userTracks: any[], recentStreams: any[]):
             artist_name: track.artist_name,
             total_streams: spotifyStreams + youtubeStreams,
             spotify_streams: spotifyStreams,
-            youtube_streams: youtubeStreams
+            youtube_streams: youtubeStreams,
+            image_url: track.image_url
         })
 
         // Find corresponding user_track to get roles

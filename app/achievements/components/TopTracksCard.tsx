@@ -1,9 +1,12 @@
+import Image from "next/image"
+
 interface TrackDetails {
     track_name: string
     artist_name: string
     total_streams: number
     spotify_streams: number
     youtube_streams: number
+    image_url: string
 }
 
 interface TopTracks {
@@ -22,17 +25,26 @@ const TopTracksCard = ({topTracks}: TopTracks) => {
             {topTracks.map((track, index) => (
                 <div key={index} className="border border-blue-200 bg-white/80 backdrop-blur rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full text-black font-bold text-sm">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full text-black font-bold text-sm flex-shrink-0">
                             {index + 1}
                         </div>
-                        <div className="flex-1">
-                            <h1 className="font-semibold text-gray-800">{track.track_name}</h1>
-                            <p className="text-sm text-gray-600">{track.artist_name}</p>
+                        <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
+                            <Image 
+                                src={track.image_url} 
+                                alt={track.track_name}
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h1 className="font-semibold text-gray-800 truncate">{track.track_name}</h1>
+                            <p className="text-sm text-gray-600 truncate">{track.artist_name}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-sm font-semibold text-gray-800">{track.total_streams.toLocaleString()}</p>
+                            <p className="text-xs text-gray-500">streams</p>
                         </div>
                     </div>
-                    <h2 className="text-sm text-gray-600 mt-2 ml-11">
-                        <span className="font-semibold">{track.total_streams.toLocaleString()}</span> streams
-                    </h2>
                 </div>
             ))}
             </div>

@@ -16,7 +16,7 @@ export default function Home() {
         {/* Navigation */}
         <Navbar />
         {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-16 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-40 lg:px-8">
           <div className="text-center">
             
             

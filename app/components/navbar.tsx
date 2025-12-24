@@ -90,6 +90,11 @@ export default function Navbar() {
                             My Profile
                         </Link>
                     )}
+                    {user && (
+                        <Link href="/achievements" className="px-4 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-lg font-medium transition-all">
+                            Wrapped
+                        </Link>
+                    )}
                 </div>
 
                 {/* Desktop Auth Buttons - hidden below 1024px */}
@@ -98,9 +103,9 @@ export default function Navbar() {
                         <div className="px-4 py-2 text-zinc-500">Loading...</div>
                     ) : user ? (
                         <>
-                            <span className="text-sm text-zinc-400 px-3 py-1.5 bg-zinc-800/50 rounded-lg border border-zinc-700 max-w-[200px] truncate">
+                            {/* <span className="text-sm text-zinc-400 px-3 py-1.5 bg-zinc-800/50 rounded-lg border border-zinc-700 max-w-[200px] truncate">
                                 {user.email}
-                            </span>
+                            </span> */}
                             <button 
                                 onClick={handleSignOut}
                                 className="px-6 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all font-medium shadow-lg hover:shadow-red-500/20"
