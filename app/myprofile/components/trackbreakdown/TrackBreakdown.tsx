@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { getUser } from "@/lib/auth"
 import { getAllUserTracksStats, IndividualTrackStats } from "@/lib/stats/getTrackStats"
 import Image from "next/image"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 const TrackBreakdown = () => {
     const [loading, setLoading] = useState(true)
@@ -71,6 +71,17 @@ const TrackBreakdown = () => {
                 
                 <div className="space-y-6">
                     {tracks.map((track) => {
+                        // Calculate daily changes for each data point
+                        const chartData = track.streamHistory.map((point, index) => {
+                            const prevPoint = index > 0 ? track.streamHistory[index - 1] : point
+                            return {
+                                ...point,
+                                totalChange: index > 0 ? point.totalStreams - prevPoint.totalStreams : 0,
+                                spotifyChange: index > 0 ? point.spotifyStreams - prevPoint.spotifyStreams : 0,
+                                youtubeChange: index > 0 ? point.youtubeStreams - prevPoint.youtubeStreams : 0
+                            }
+                        })
+
                         // Compute dynamic y-axis bounds for each chart type
                         const totalValues = track.streamHistory.map((s) => s.totalStreams || 0)
                         const totalMinVal = totalValues.length ? Math.min(...totalValues) : 0
@@ -170,7 +181,7 @@ const TrackBreakdown = () => {
                                             <h4 className="text-sm font-semibold text-gray-800">Total Stream History</h4>
                                         </div>
                                         <ResponsiveContainer width="100%" height={150}>
-                                            <AreaChart data={track.streamHistory}>
+                                            <ComposedChart data={chartData}>
                                                 <defs>
                                                     <linearGradient id={`total-gradient-${track.trackId}`} x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
@@ -183,6 +194,7 @@ const TrackBreakdown = () => {
                                                     tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                 />
                                                 <YAxis 
+                                                    yAxisId="left"
                                                     tick={{ fontSize: 10 }}
                                                     domain={[totalYMin, totalYMax]}
                                                     tickFormatter={(value) => {
@@ -191,19 +203,46 @@ const TrackBreakdown = () => {
                                                         return value.toString()
                                                     }}
                                                 />
+                                                <YAxis 
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    tick={{ fontSize: 10 }}
+                                                    tickFormatter={(value) => {
+                                                        if (value >= 1000) return `+${(value / 1000).toFixed(0)}K`
+                                                        return value > 0 ? `+${value}` : value.toString()
+                                                    }}
+                                                />
                                                 <Tooltip 
-                                                    formatter={(value: number) => [value.toLocaleString(), 'Total']}
+                                                    formatter={(value: number, name: string) => {
+                                                        if (name === 'Daily Change') {
+                                                            return [value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString(), name]
+                                                        }
+                                                        return [value.toLocaleString(), name]
+                                                    }}
                                                     labelFormatter={(label) => new Date(label).toLocaleDateString()}
                                                     contentStyle={{ backgroundColor: '#faf5ff', border: '1px solid #e9d5ff' }}
                                                 />
+                                                <Legend wrapperStyle={{ fontSize: '12px' }} />
                                                 <Area 
+                                                    yAxisId="left"
                                                     type="monotone" 
                                                     dataKey="totalStreams" 
+                                                    name="Total Streams"
                                                     stroke="#8b5cf6" 
                                                     fill={`url(#total-gradient-${track.trackId})`}
                                                     strokeWidth={2}
                                                 />
-                                            </AreaChart>
+                                                <Line 
+                                                    yAxisId="right"
+                                                    type="monotone" 
+                                                    dataKey="totalChange"
+                                                    name="Daily Change"
+                                                    stroke="#ec4899" 
+                                                    strokeWidth={2}
+                                                    strokeDasharray="5 5"
+                                                    dot={{ r: 3 }}
+                                                />
+                                            </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
 
@@ -218,7 +257,7 @@ const TrackBreakdown = () => {
                                             <h4 className="text-sm font-semibold text-gray-800">Spotify Streams</h4>
                                         </div>
                                         <ResponsiveContainer width="100%" height={150}>
-                                            <AreaChart data={track.streamHistory}>
+                                            <ComposedChart data={chartData}>
                                                 <defs>
                                                     <linearGradient id={`spotify-gradient-${track.trackId}`} x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="5%" stopColor="#1DB954" stopOpacity={0.8}/>
@@ -231,6 +270,7 @@ const TrackBreakdown = () => {
                                                     tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                 />
                                                 <YAxis 
+                                                    yAxisId="left"
                                                     tick={{ fontSize: 10 }}
                                                     domain={[spotifyYMin, spotifyYMax]}
                                                     tickFormatter={(value) => {
@@ -239,19 +279,46 @@ const TrackBreakdown = () => {
                                                         return value.toString()
                                                     }}
                                                 />
+                                                <YAxis 
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    tick={{ fontSize: 10 }}
+                                                    tickFormatter={(value) => {
+                                                        if (value >= 1000) return `+${(value / 1000).toFixed(0)}K`
+                                                        return value > 0 ? `+${value}` : value.toString()
+                                                    }}
+                                                />
                                                 <Tooltip 
-                                                    formatter={(value: number) => [value.toLocaleString(), 'Spotify']}
+                                                    formatter={(value: number, name: string) => {
+                                                        if (name === 'Daily Change') {
+                                                            return [value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString(), name]
+                                                        }
+                                                        return [value.toLocaleString(), name]
+                                                    }}
                                                     labelFormatter={(label) => new Date(label).toLocaleDateString()}
                                                     contentStyle={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
                                                 />
+                                                <Legend wrapperStyle={{ fontSize: '12px' }} />
                                                 <Area 
+                                                    yAxisId="left"
                                                     type="monotone" 
-                                                    dataKey="spotifyStreams" 
+                                                    dataKey="spotifyStreams"
+                                                    name="Spotify Streams"
                                                     stroke="#1DB954" 
                                                     fill={`url(#spotify-gradient-${track.trackId})`}
                                                     strokeWidth={2}
                                                 />
-                                            </AreaChart>
+                                                <Line 
+                                                    yAxisId="right"
+                                                    type="monotone" 
+                                                    dataKey="spotifyChange"
+                                                    name="Daily Change"
+                                                    stroke="#15803d" 
+                                                    strokeWidth={2}
+                                                    strokeDasharray="5 5"
+                                                    dot={{ r: 3 }}
+                                                />
+                                            </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
 
@@ -264,7 +331,7 @@ const TrackBreakdown = () => {
                                             <h4 className="text-sm font-semibold text-gray-800">YouTube Views</h4>
                                         </div>
                                         <ResponsiveContainer width="100%" height={150}>
-                                            <AreaChart data={track.streamHistory}>
+                                            <ComposedChart data={chartData}>
                                                 <defs>
                                                     <linearGradient id={`youtube-gradient-${track.trackId}`} x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="5%" stopColor="#FF0000" stopOpacity={0.8}/>
@@ -277,6 +344,7 @@ const TrackBreakdown = () => {
                                                     tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                 />
                                                 <YAxis 
+                                                    yAxisId="left"
                                                     tick={{ fontSize: 10 }}
                                                     domain={[youtubeYMin, youtubeYMax]}
                                                     tickFormatter={(value) => {
@@ -285,19 +353,46 @@ const TrackBreakdown = () => {
                                                         return value.toString()
                                                     }}
                                                 />
+                                                <YAxis 
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    tick={{ fontSize: 10 }}
+                                                    tickFormatter={(value) => {
+                                                        if (value >= 1000) return `+${(value / 1000).toFixed(0)}K`
+                                                        return value > 0 ? `+${value}` : value.toString()
+                                                    }}
+                                                />
                                                 <Tooltip 
-                                                    formatter={(value: number) => [value.toLocaleString(), 'YouTube']}
+                                                    formatter={(value: number, name: string) => {
+                                                        if (name === 'Daily Change') {
+                                                            return [value > 0 ? `+${value.toLocaleString()}` : value.toLocaleString(), name]
+                                                        }
+                                                        return [value.toLocaleString(), name]
+                                                    }}
                                                     labelFormatter={(label) => new Date(label).toLocaleDateString()}
                                                     contentStyle={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca' }}
                                                 />
+                                                <Legend wrapperStyle={{ fontSize: '12px' }} />
                                                 <Area 
+                                                    yAxisId="left"
                                                     type="monotone" 
-                                                    dataKey="youtubeStreams" 
+                                                    dataKey="youtubeStreams"
+                                                    name="YouTube Views"
                                                     stroke="#FF0000" 
                                                     fill={`url(#youtube-gradient-${track.trackId})`}
                                                     strokeWidth={2}
                                                 />
-                                            </AreaChart>
+                                                <Line 
+                                                    yAxisId="right"
+                                                    type="monotone" 
+                                                    dataKey="youtubeChange"
+                                                    name="Daily Change"
+                                                    stroke="#dc2626" 
+                                                    strokeWidth={2}
+                                                    strokeDasharray="5 5"
+                                                    dot={{ r: 3 }}
+                                                />
+                                            </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
                                     </div>
