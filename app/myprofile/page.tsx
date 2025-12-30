@@ -20,7 +20,7 @@ export default function MyProfile() {
             <Navbar />
             <div className="flex flex-col min-h-screen">
                 <ProfileHeader userStats={userStats} userProfile={userProfile} loading={loading} />
-                <div className = 'flex px-12 py-6 '>
+                <div className = 'flex py-6 '>
                     <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab}/>
                     <div className="flex-1">
                         {activeTab === 'tracks' && <TrackSection />}

@@ -81,8 +81,8 @@ const ProductionStreakGraph = ({ tracks, loading }: ProductionStreakGraphProps) 
     const getColor = (count: number) => {
         if (count === -1) return 'bg-transparent' // Future or outside year
         if (count === 0) return 'bg-neutral-100'
-        if (count === 1) return 'bg-neutral-400'
-        if (count === 2) return 'bg-neutral-600'
+        if (count === 1) return 'bg-green-400'
+        if (count === 2) return 'bg-green-600'
         return 'bg-neutral-900' // 3+ tracks
     }
 
@@ -223,9 +223,9 @@ const ProductionStreakGraph = ({ tracks, loading }: ProductionStreakGraphProps) 
                 <span>Less</span>
                 <div className="flex gap-[3px]">
                     <div className="w-[11px] h-[11px] rounded-sm bg-neutral-100"></div>
-                    <div className="w-[11px] h-[11px] rounded-sm bg-neutral-400"></div>
-                    <div className="w-[11px] h-[11px] rounded-sm bg-neutral-600"></div>
-                    <div className="w-[11px] h-[11px] rounded-sm bg-neutral-900"></div>
+                    <div className="w-[11px] h-[11px] rounded-sm bg-green-400"></div>
+                    <div className="w-[11px] h-[11px] rounded-sm bg-green-600"></div>
+                    <div className="w-[11px] h-[11px] rounded-sm bg-green-900"></div>
                 </div>
                 <span>More</span>
             </div>

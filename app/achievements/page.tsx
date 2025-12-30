@@ -53,25 +53,48 @@ export default function ProducerWrapped() {
         )
     }
 
+    const currentYear = new Date().getFullYear()
+
     return (
         <>
             <Navbar />
+            <div className="min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 py-12 px-4">
+                <div className="max-w-10xl mx-auto">
+                    {/* Main Wrapped Card */}
+                    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                        {/* Header Section */}
 
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 py-8 flex items-center justify-center mx-5">
-                <div className="container mx-auto px-4 w-25/100">
-                    
-                    <TopTracksCard topTracks={topTracks}/>
-                </div>
-                <div className="container mx-auto px-4 w-50/100">
-                    <UserInfo userProfile={userProfile} />
-                    <Totals 
-                        totalStreams={totalStreams} 
-                        youtubeStreams={youtubeStreams} 
-                        spotifyStreams={spotifyStreams}
-                    />
-                </div>
-                <div className="container mx-auto px-4 w-25/100">
-                    <TopRolesCard topRoles={topRoles} />
+                        {/* Content Grid */}
+                        <div className="p-12">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* Left Column - Top Tracks */}
+                                <div className="lg:col-span-1">
+                                    <TopTracksCard topTracks={topTracks}/>
+                                </div>
+
+                                {/* Center Column - Main Stats */}
+                                <div className="lg:col-span-1 space-y-6">
+                                    <UserInfo userProfile={userProfile} totalStreams={totalStreams} trackCount={trackCount}/>
+                                    <Totals 
+                                        totalStreams={totalStreams} 
+                                        youtubeStreams={youtubeStreams} 
+                                        spotifyStreams={spotifyStreams}
+                                        track_count={trackCount}
+                                    />
+                                </div>
+
+                                {/* Right Column - Top Roles */}
+                                <div className="lg:col-span-1">
+                                    <TopRolesCard topRoles={topRoles} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-neutral-50 px-12 py-6 border-t border-neutral-200 text-center">
+                            <p className="text-neutral-600 text-sm">Share your Producer Wrapped</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

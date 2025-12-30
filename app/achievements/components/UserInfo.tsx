@@ -8,15 +8,17 @@ interface UserProfile {
 
 interface UserInfoProps {
     userProfile: UserProfile | null
+    totalStreams: number
+    trackCount: number
 }
 
-const UserInfo = ({userProfile}: UserInfoProps) => {
+const UserInfo = ({userProfile, totalStreams, trackCount}: UserInfoProps) => {
     const avatarUrl = userProfile?.avatar_url || '/default-avatar.png'
     
     return (
-        <>
-            <div className="flex items-center gap-6 border border-gray-300 rounded-xl p-8 bg-white shadow-md justify-center">
-                <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 ">
+        <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-2xl p-8 shadow-xl text-center">
+            <div className="flex flex-col items-center">
+                <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0 bg-neutral-700 mb-6 ring-4 ring-white shadow-lg">
                     {userProfile?.avatar_url ? (
                         <Image 
                             src={userProfile.avatar_url} 
@@ -25,17 +27,24 @@ const UserInfo = ({userProfile}: UserInfoProps) => {
                             className="object-cover"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-400">
+                        <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-white">
                             {userProfile?.user_name?.charAt(0).toUpperCase() || '?'}
                         </div>
                     )}
                 </div>
-                <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold text-gray-800">{userProfile ? userProfile.user_name : 'Welcome'}</h1>
-                    <h1 className="text-4xl font-bold mt-1">1,000,000 Streams</h1>
+                <h1 className="text-3xl font-bold text-white mb-2">{userProfile ? userProfile.user_name : 'Producer'}</h1>
+                <div className="mt-6 space-y-4 w-full">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                        <p className="text-white/70 text-sm mb-2">Total Streams</p>
+                        <p className="text-5xl font-black text-white">{totalStreams.toLocaleString()}</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                        <p className="text-white/70 text-sm mb-2">Tracks Produced</p>
+                        <p className="text-4xl font-black text-white">{trackCount}</p>
+                    </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

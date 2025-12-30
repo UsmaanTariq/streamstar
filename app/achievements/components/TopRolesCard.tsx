@@ -16,23 +16,24 @@ const TopRolesCard = ({topRoles}: TopRoles) => {
     }
     
     return (
-        <div className="w-full p-6 border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg mt-4">
-            <h1 className="text-xl font-bold mb-5 text-gray-800">Your Top Roles</h1>
+        <div className="w-full bg-white rounded-2xl shadow-xl p-6 border border-neutral-200">
+            <h1 className="text-2xl font-black text-neutral-900 mb-6">Top Roles</h1>
             <div className="flex flex-col gap-3">
             {topRoles.map((roles, index) => (
-                <div key={index} className="border border-blue-200 bg-white/80 backdrop-blur rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full text-black font-bold text-sm">
+                <div key={index} className="bg-neutral-50 rounded-xl p-5 hover:bg-neutral-100 transition-colors border border-neutral-200">
+                    <div className="flex items-center gap-4 mb-3">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white font-black text-lg flex-shrink-0">
                             {index + 1}
                         </div>
                         <div className="flex-1">
-                            <h1 className="font-semibold text-gray-800">{roles.role}</h1>
-                            <p className="text-sm text-gray-600">Tracks: {roles.track_count}</p>
+                            <h1 className="font-bold text-neutral-900 text-lg">{roles.role}</h1>
+                            <p className="text-sm text-neutral-600 font-medium">{roles.track_count} track{roles.track_count !== 1 ? 's' : ''}</p>
                         </div>
                     </div>
-                    <h2 className="text-sm text-gray-600 mt-2 ml-11">
-                        <span className="font-semibold">{roles.total_streams.toLocaleString()}</span> streams
-                    </h2>
+                    <div className="ml-14">
+                        <p className="text-2xl font-black text-neutral-900">{roles.total_streams.toLocaleString()}</p>
+                        <p className="text-xs text-neutral-500 font-medium">total streams</p>
+                    </div>
                 </div>
             ))}
             </div>
